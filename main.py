@@ -75,7 +75,7 @@ class User(UserMixin, db.Model):
     comments = db.relationship("Comment", back_populates="comment_author")
 
 
-db.create_all()
+# db.create_all()
 
 
 def admin_only(f):
