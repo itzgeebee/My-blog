@@ -16,7 +16,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from forms import CreatePostForm, CreateUserForm, LoginUserForm, CommentForm
 from flask_gravatar import Gravatar
 
-from flask_debugtoolbar import DebugToolbarExtension
+
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -37,8 +37,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.debug = True
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-toolbar = DebugToolbarExtension(app)
+
 
 
 ##CONFIGURE TABLES
