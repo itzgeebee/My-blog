@@ -25,6 +25,7 @@
       <div class="col-lg-8 col-md-10 mx-auto content">
         <p>{{error}}</p>
         {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+        <a href="{{url_for('register')}}">Sign up instead</a>
       </div>
     </div>
   </div>

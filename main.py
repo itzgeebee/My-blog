@@ -173,7 +173,7 @@ def about():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-    reader_message = ""
+
     name = request.form.get("mailer")
     mail = request.form.get("mailer-address")
     number = request.form.get("mailer-num")
