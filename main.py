@@ -7,6 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
 import yagmail
+import keyring
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import abort
 from werkzeug.security import generate_password_hash, check_password_hash
