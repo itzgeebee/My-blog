@@ -21,7 +21,8 @@ from flask_gravatar import Gravatar
 login_manager = LoginManager()
 app = Flask(__name__)
 login_manager.init_app(app)
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+# app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config['SECRET_KEY'] = "secretkey"
 ckeditor = CKEditor(app)
 Bootstrap(app)
 gravatar = Gravatar(app,
@@ -34,6 +35,7 @@ gravatar = Gravatar(app,
                     base_url=None)
 ##CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
+# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///blog.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -77,7 +79,7 @@ class User(UserMixin, db.Model):
 
 # db.create_all()
 
-
+# decorator function for admin login
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -104,24 +106,30 @@ def get_all_posts():
 def register():
     form = CreateUserForm()
     if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        confirm_password =form.confirm_password.data
+        if confirm_password==password:
 
-        new_user = User(email=form.email.data,
-                        password=generate_password_hash(form.password.data, method='pbkdf2'
-                                                                                   ':sha256',
-                                                        salt_length=8),
-                        name=form.name.data
-                        )
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-        except IntegrityError:
-            error = "email already exists"
-            return redirect(url_for("login", error=error))
+            new_user = User(email=email,
+                            password=generate_password_hash(password, method='pbkdf2'
+                                                                                       ':sha256',
+                                                            salt_length=8),
+                            name=form.name.data
+                            )
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+            except IntegrityError:
+                error = "email already exists"
+                return redirect(url_for("login", error=error))
+            else:
+
+                login_user(new_user, remember=True)
+                return redirect(url_for("get_all_posts"))
         else:
-
-            login_user(new_user)
-            return redirect(url_for("get_all_posts"))
-
+            flash("Passwords do not match, try again")
+            return redirect(url_for("register"))
     return render_template("register.html", form=form, logged_in=current_user.is_authenticated)
 
 
@@ -139,7 +147,7 @@ def login():
             error = "Invalid email"
         else:
             if check_password_hash(pwhash=user.password, password=user_password):
-                login_user(user)
+                login_user(user, remember=True)
                 return redirect(url_for("get_all_posts", name=user.name))
             else:
                 error = "Invalid password"
@@ -248,7 +256,7 @@ def delete_post(post_id):
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
-
+# delete comment
 @app.route("/delete-comment/<int:comment_id>", methods=["GET", "POST"])
 @admin_only
 def delete_comment(comment_id):
